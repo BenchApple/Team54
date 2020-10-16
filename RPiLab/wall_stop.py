@@ -17,9 +17,11 @@ try:
 				BP.get_motor_encoder(BP.PORT_D)))
 		BP.set_motor_power(BP.PORT_A+BP.PORT_D,30)
 except IOError as error:
-	print(error)
+        print("it's an io error")
+        print(error)
 except TypeError as error:
-	print(error)
+        print("it's a type error")
+        print(error)
 except KeyboardInterrupt:
 	print("You pressed ctrl+C...")
 
