@@ -77,7 +77,8 @@ def decelToSlow(bp, right, left, curSpeed):
 def turnRight(bp, right, left, curSpeed):
     curSpeed = decelToSlow(bp, right, left, curSpeed)
 
-    bp.set_motor_power(right, curSpeed * 2)
+    bp.set_motor_power(left, curSpeed * 2)
+    bp.set_motor_power(right, curSpeed * .5)
     
     time.sleep(1)
 
