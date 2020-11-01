@@ -11,9 +11,9 @@ bp = brickpi3.BrickPi3()
 def main():
     try:
         # Create our sensor types and stuff
-        leftDrive = bp.PORT_C
-        rightDrive = bp.PORT_B
-        steering = bp.PORT_D
+        left = bp.PORT_C
+        right = bp.PORT_B
+        steer = bp.PORT_D
 
         # Test steering
         #steeringTest(bp, steering)
@@ -24,12 +24,25 @@ def main():
         # Test left motor
         #driveTest(bp, leftDrive)
 
-        shimmy(bp, rightDrive, leftDrive, steering)
-
+        print("is this working?")
+        driveToMe(bp, right, left, steer)
+    
     except KeyboardInterrupt:
+        bp.reset_all()
+    except NameError:
         bp.reset_all()
 
     bp.reset_all()
+
+def circle(bp, right, left, steer):
+    print("why")
+    bp.set_motor_power(steer, 20)
+    time.sleep(.7)
+    bp.set_motor_power(steer, 0)
+
+    speed = accelBoth(bp, right, left, 0, 50, 2)
+    time.sleep(5)
+    speed = accelBoth(bp, right, left, speed, 0, 2)
 
 def steeringTest(bp, steering):
     # Test the steering motor.
@@ -83,18 +96,54 @@ def shimmy(bp, right, left, steer):
 
     # Turn left, then go forward a little.
     bp.set_motor_power(steer, 20)
-    time.sleep(.2)
+    time.sleep(.3)
     bp.set_motor_power(steer, 0)
     
     speed = accelBoth(bp, right, left, speed, 50, 1)
-    time.sleep(0)
+    time.sleep(1)
+
+    bp.set_motor_power(steer, -20)
+    time.sleep(.4)
+    bp.set_motor_power(steer, 0)
+
+    time.sleep(2)
     # Decelerate
     speed = accelBoth(bp, right, left, speed, 0, 1)
 
     bp.reset_all()
 
+def driveToMe(bp, right, left, steer):
+    speed = 0
 
-# Goes from target speed to final speed in time, returns final speed. Time is in seconds.
+    # Turn left a little to face me
+    bp.set_motor_power(steer, 20)
+    speed = accelBoth(bp, right, left, speed, 30, .3)
+    bp.set_motor_power(steer, 0)
+    time.sleep(.5)
+    bp.set_motor_power(steer, -20)
+    time.sleep(.3)
+    bp.set_motor_power(steer, 0)
+
+    speed = accelBoth(bp, right, left, speed, 60, 2)
+    time.sleep(3)
+    speed = accelBoth(bp, right, left, speed, 0, 2)
+
+    bp.reset_all()
+
+def turnTimeTest(bp, steer):
+    for i in range(0, 20):
+        bp.set_motor_power(steer, 20)
+        time.sleep(2* i / 20)
+        bp.set_motor_power(steer, 0)
+        time.sleep(.1)
+        bp.set_motor_power(steer, -20)
+        time.sleep(2*i / 20)
+        bp.set_motor_power(steer, 0)
+        time.sleep(.5)
+
+        print(2*i/20)
+
+# Goes from target speed to final speed in time, returns final speed. Time t is in seconds.
 def accelBoth(bp, right, left, startSpeed, targetSpeed, t): # Take the target speed in positive, turn it into negative in this function    
     # Calculate the needed time step.
     timeStep = abs(t / (targetSpeed - startSpeed))
