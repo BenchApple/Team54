@@ -15,7 +15,7 @@ import time
 # but might be better to instead set the power of one of them then somehow make it so the other one
 # constantly matches the first one.
 def accelerate(bp, right, left, initialPower, targetPower, t):
-    timeStep = abs(t / (targetPower - initialPower)) # Calculates the time step of the acceleration,
+    timeStep = abs(t / (targetPower - initialPower)) if targetPower != initialPower else 0 # Calculates the time step of the acceleration,
     # how much time in between power increase.
 
     # Determine the direction of the acceleration, positive or negative.
@@ -29,8 +29,9 @@ def accelerate(bp, right, left, initialPower, targetPower, t):
         bp.set_motor_power(right, i)
         bp.set_motor_power(left, i)
 
-        # Wait for the time step before the next increment.
-        time.sleep(timeStep)
+        # Wait for the time step before the next increment. If the step is very small, ignore.
+        if timeStep > .005:
+            time.sleep(timeStep)
 
     # Return the final power of the motors. All calls to this function should set some power variable equal
     # to the return of this funciton.

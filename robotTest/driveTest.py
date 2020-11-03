@@ -13,7 +13,7 @@ bp = brickpi3.BrickPi3()
 
 def main():
     try:
-        time.sleep(6)
+        time.sleep(3)
         
         # Initialize ports for motors
         right = bp.PORT_B
@@ -95,5 +95,28 @@ def wallStop(bp, right, left, steer, frontSonic):
 
     power = drive.stop(bp, right, left, power, .1)
 
+def wallSlow(bp, right, left, steer, frontSonic):
+    pos = bp.get_motor_encoder(steer)
+    pos = drive.setStraight(bp, steer, pos)
+
+    power = 0
+    maxPower = 60
+    slowD = 40
+    power = drive.accelerate(bp, right, left, power, maxPower, 2)
+    d = s.getUltrasonic(frontSonic)
+
+    while power >= 8:
+        print(d)
+        time.sleep(.01)
+        d = s.getUltrasonic(frontSonic)
+
+        if d <= slowD:
+            newPower = maxPower - (slowD - d) 
+            power = drive.accelerate(bp, right, left, power, newPower, .1)
+        elif d <= 10:
+            power = drive.stop(bp, right, left, power, .1)
+
+    power = drive.stop(bp, right, left, power, .1)
+    
 if __name__ == "__main__":
     main()
