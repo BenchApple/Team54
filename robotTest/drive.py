@@ -4,7 +4,7 @@
 import brickpi3
 import time
 
-# accelerates the machine to a specific power value, from the current value over the course of time t.
+# Accelerates the machine to a specific power value, from the current value over the course of time t.
 # bp takes the brickpi object originally created.
 # right takes the brickpi argument for the right motor
 # left takes the brickpi argument for the left motor
@@ -34,39 +34,48 @@ def accelerate(bp, right, left, initialPower, targetPower, t):
 
     # Return the final power of the motors. All calls to this function should set some power variable equal
     # to the return of this funciton.
-    return targetSpeed
+    return targetPower
 
 # Stops the vehible over the course of time t.
 # bp takes the brickpi object
 # right and left take the brickpi designations for the right and left motors respectively.
 # intial power takes the power of the motors at the time of calling the function.
 # t takes the amount of time the stopping should take place over
-def stop(bp, right, left, intialPower, t):
+def stop(bp, right, left, initialPower, t):
     return accelerate(bp, right, left, initialPower, 0, t)
 
 # Sets the position of the steering motor to 0, aka perfectly straight.
 # bp takes the brickpi object originally created.
 # steer takes the id of the steering motor according to brickPi.
+# pos takes the current position of the steering motor
 
 # NOTE: This could be a detrimental system IF the gear ever comes off the track.
 # NOTE: we may need to devise a system to determine exactly what position the exact straight is.
-def setStraight(bp, steer):
-    return rotateAxle(bp, steer, 0)
+def setStraight(bp, steer, pos):
+    return rotateAxle(bp, steer, 0, pos)
 
-# Rotates the axle motor to the target position.
+# Rotates the axle motor to the target position. Returns the initial position if the target spot is greater than the limit.
 # bp takes the brickpi object
 # steer takes the motor designation of the steering motor according to brickpi
 # target takes the target location of the axle motor.
+# initialPos takes the initial position of the motor, idek if this has a use yet.
+# degreesps takes the desired degrees per second of rotation.
+# t takes the time in seconds for the rotation to occur over. This call is optional.
 
 # NOTE: This could be a detrimental system IF the gear ever comes off the track.
 # NOTE: we may need to devise a system to determine exactly what position the exact straight is.
 # NOTE: We need to do tests on how exactly set_motor_position works, what the viable range of values could be, etc
-# TODO: let the caller customize degrees per second and have it ask for the starting position as well.
-def rotateAxle(bp, steer, target):
-    degreesPerSecond = 100
-    start = bp.get_motor_encoder(steer)
+# TODO: Determine exactly how far in degrees the robot can rotate before it hits its max. Implement stoppers to prevent calls past that point.
+# With the current (7 hole) design, the limit in degrees is 200
+# With the 9 hole design, the limit in degrees is 250
+def rotateAxle(bp, steer, target, initialPos, degreesps = 200, t = 0):
+    if abs(target) > 250:
+        return initialPos
+    
+    if t:
+        degreesps = target / t
 
-    bp.set_motor_limits(steer, dps = degreesPerSecond)
+    bp.set_motor_limits(steer, dps = degreesps)
     
     bp.set_motor_position(steer, target)
 
