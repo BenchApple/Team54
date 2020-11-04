@@ -150,7 +150,12 @@ def avoid(bp, rightm, leftm, steer, front, rightu, leftu):
     stopDist = 15
     degreeChange = 50
     power = drive.accelerate(bp, right, left, power, maxPower, 1)
-    
+
+    fDist = s.getUltrasonic(frontu)
+    rDist = s.getUltrasonic(rightu)
+    lDist = s.getUltrasonic(leftu)
+
+    while fdist
             
         
     
