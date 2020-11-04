@@ -12,42 +12,31 @@ import numpy as np
 
 class Robot:
     # Class variables - Anything initialized to false will be assigned by the user during object initialization
-    bp = False # Stores the brickpi object
-    leftM = False # Stores the left drive motor
-    rightM = False # Stores the right drive motor
-    steerM = False # Stores the bp id for the steering motor
-    trailerM = False # Stores the bp id for the trailer motor
     power = 0 # Stores the persistent power of the two back motors NOTE: may change to degrees per second
     pos = 0 # Stores the position of the steering motor. abs(pos) always less than 250
     urgencies = [0, 0, 0] # Stores the urgency array in order [front, right, left]
-    rightU = False # Stores the grove ID of the right ultrasonic sensor
-    leftU = False # Stores the grove ID of the left ultrasonic sensor
-    frontU = False # Stores the grove ID of the front ultrasonic sensor
     frontDist = 500 # Stores the distance read by the front ultrasonic
     rightDist = 500 # Stores the distance read by the right ultrasonic
     leftDist = 500 # Stores the distance read by the left ultrasonic
     dismountTime = 5 # Stores the time desired to let the dismount happen.
     trailerPower = 40 # Stores the power for the trailer motor.
-    cylCount = False # Stores the number of cylinders carried
-    cubeCount = False # Stores the number of cubes carried
-    coneCount = False # Stores the number of cones carried.
     m = 20 # Max urgency distance, used in turning calculations
     k = -1 # Urgency constant, used in turning calculations
     maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
 
     # Initialization function, takes all motor and ultrasonic sensor arguments from above.
     def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, _cyl=0, _cube=0, _cone=0):
-        self.bp = _bp
-        self.leftM = _lm
-        self.rightM = _rm
-        self.steerM = _sm
-        self.tralerM = _tm
-        self.rightU = _ru
-        self.leftU = _lu
-        self.frontU = _fu
-        self.cylCount = _cyl
-        self.cubeCount = _cube
-        self.coneCount = _cone
+        self.bp = _bp # Stores the brickpi object
+        self.leftM = _lm # Stores the left drive motor
+        self.rightM = _rm # stores the right drive motor
+        self.steerM = _sm # stores the bp id for the steering motor
+        self.tralerM = _tm # stores the id for the trailer motor
+        self.rightU = _ru # stores the port of the right ultrasonic
+        self.leftU = _lu # Stores the port of the left ultrasonic 
+        self.frontU = _fu # stores the port of the front ultrasonic
+        self.cylCount = _cyl # Stores the number of cylinders
+        self.cubeCount = _cube # stores the number of cubes
+        self.coneCount = _cone # stores the number of comes.
         self.diagnostics()
 
     # TODO create a setup function for basic instrument calibration.
