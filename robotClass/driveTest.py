@@ -9,7 +9,7 @@ import time
 
 def main():
     try:
-        time.sleep(3)
+        time.sleep(0)
         
         # Initlailize our brickpi object
         bp = brickpi3.BrickPi3()
@@ -25,13 +25,16 @@ def main():
         rightU = 4
         leftU = 8
 
+        time.sleep(1)
+
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU)
-        print(r.trailerM)
+        print(r.getTrailerM())
         r.dismount()
+        r.accelerate(40, 1)
         
 
-        time.sleep(3)
+        time.sleep(2)
         
         print("All done")
 
@@ -39,9 +42,9 @@ def main():
         
     except KeyboardInterrupt:
         bp.reset_all()
-    except Exception as e:
-        print(e)
-        bp.reset_all()
+    #except Exception as e:
+     #   print(e)
+      #  bp.reset_all()
 
 def wiggle(r):
     r.accelerate(60, 1)
@@ -99,18 +102,19 @@ def avoidDeprecated(bp, right, left, steer, frontSonic):
             power = drive.accelerate(bp, right, left, power, newPower, .1)
 
 # TODO finish writing this function with the three ultrasonics. avoidDeprecated will work when adjusted to new system.
-def avoid(bp, rightm, leftm, steer, front, rightu, leftu):
-    maxPower = 40
+def avoid(r):
+    maxPower = 45
     slowDist = 60
-    stopDist = 15
+    stopDist = 20
     degreeChange = 50
-    power = drive.accelerate(bp, right, left, power, maxPower, 1)
+    r.accelerate(maxPower, 1)
 
-    fDist = s.getUltrasonic(frontu)
-    rDist = s.getUltrasonic(rightu)
-    lDist = s.getUltrasonic(leftu)
+    
+    while r.getFrontDist() > stopDist:
+        r.getUrgency()
+        r.turnFromUrgency()
 
-    while fdist
+    r.stop()
             
         
     

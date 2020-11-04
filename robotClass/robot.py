@@ -19,7 +19,7 @@ class Robot:
     rightDist = 500 # Stores the distance read by the right ultrasonic
     leftDist = 500 # Stores the distance read by the left ultrasonic
     dismountTime = 5 # Stores the time desired to let the dismount happen.
-    trailerPower = 40 # Stores the power for the trailer motor.
+    trailerPower = -15 # Stores the power for the trailer motor.
     m = 20 # Max urgency distance, used in turning calculations
     k = -1 # Urgency constant, used in turning calculations
     maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
@@ -30,7 +30,7 @@ class Robot:
         self.leftM = _lm # Stores the left drive motor
         self.rightM = _rm # stores the right drive motor
         self.steerM = _sm # stores the bp id for the steering motor
-        self.tralerM = _tm # stores the id for the trailer motor
+        self.trailerM = _tm # stores the id for the trailer motor
         self.rightU = _ru # stores the port of the right ultrasonic
         self.leftU = _lu # Stores the port of the left ultrasonic 
         self.frontU = _fu # stores the port of the front ultrasonic
@@ -255,7 +255,7 @@ class Robot:
     # With the 9 hole design, the limit in degrees is 250
     def rotateAxle(self, target, degreesps = 200, t = 0):
         if abs(target) > 250: # TODO: set some sort of proper way to handle this situation.
-            self.pos = self.maxTurn
+            target = self.maxTurn if target > 1 else -self.maxTurn
     
         if t:
             degreesps = target / t
@@ -269,8 +269,18 @@ class Robot:
     # TODO Finish this function
     def turnFromUrgency(self):
         f = self.urgencies[0] # The front urgency
-        r = self.urgencies[1] # the right urgency
-        l = self.urgencies[2] # the left urgency
+        r = self.urgencies[1] # the right urgency - positive direction
+        l = self.urgencies[2] # the left urgency - negative direction
+
+        if f > r > l:
+            if r > l:
+                self.rotateAxle(-self.maxTurn * f)
+            else:
+                self.rotateAxle(self.maxTurn * f)
+        elif r > l:
+            self.rotateAxle(-self.maxTurn * r)
+        else:
+            self.rotateAxle(self.maxTurn * l)
 
         # TODO determine the direction to turn based on the urgencies value. Fucking do this with
         # Annelise in the room please.
@@ -316,12 +326,12 @@ class Robot:
     def dismount(self):
         # The amount of time it takes the fully dismount
 
-        for i in range(0, self.trailerPower):
+        for i in range(0, self.trailerPower, 1 if self.trailerPower > 0 else -1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(.05)
 
         time.sleep(self.dismountTime)
 
-        for i in range(self.trailerPower, 0, -1):
+        for i in range(self.trailerPower, 0, -1 if self.trailerPower > 0 else 1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(0.01)
