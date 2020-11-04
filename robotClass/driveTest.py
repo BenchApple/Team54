@@ -27,8 +27,9 @@ def main():
 
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU)
+        print(r.trailerM)
+        r.dismount()
         
-        avoid(bp, right, left, steer, front)
 
         time.sleep(3)
         
