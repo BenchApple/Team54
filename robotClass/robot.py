@@ -36,7 +36,7 @@ class Robot:
     maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
 
     # Initialization function, takes all motor and ultrasonic sensor arguments from above.
-    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, _cyl, _cube, _cone):
+    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, _cyl=0, _cube=0, _cone=0):
         self.bp = _bp
         self.leftM = _lm
         self.rightM = _rm
@@ -48,6 +48,7 @@ class Robot:
         self.cylCount = _cyl
         self.cubeCount = _cube
         self.coneCount = _cone
+        self.diagnostics()
 
     # TODO create a setup function for basic instrument calibration.
 
@@ -203,6 +204,11 @@ class Robot:
     def setMaxTurn(self, mt):
         self.maxTurn = mt
 
+    # Performs basic diagnostics on the robot, such as setting wheels straight, etc.
+    # Current functions. Set wheels straight.
+    def diagnostics(self):
+        self.setStraight()
+
     # Accelerates the machine to a specific power value, from the current value over the course of time t
     # targetPower takes the desired power for the motors, the top speed.
     # t takes the amount of time that the acceleration should be done over.
@@ -255,13 +261,12 @@ class Robot:
 
     # NOTE: This could be a detrimental system IF the gear ever comes off the track.
     # NOTE: we may need to devise a system to determine exactly what position the exact straight is.
-    # NOTE: We need to do tests on how exactly set_motor_position works, what the viable range of values could be, etc
     # TODO: Determine exactly how far in degrees the robot can rotate before it hits its max. Implement stoppers to prevent calls past that point.
     # With the current (7 hole) design, the limit in degrees is 200
     # With the 9 hole design, the limit in degrees is 250
     def rotateAxle(self, target, degreesps = 200, t = 0):
         if abs(target) > 250: # TODO: set some sort of proper way to handle this situation.
-            self.pos = self.pos
+            self.pos = self.maxTurn
     
         if t:
             degreesps = target / t
@@ -292,11 +297,7 @@ class Robot:
 
     def getUrgency(self):
         # Get the updated ultrasonic readings
-        self.getUltrasonics
-
-        # Variable declaration - subject to change
-        m = 20 # Max urgency distance. When urgency is at it's maximum. Minimum urgency is always at maximum distance
-        k = -1 # The urgency constant, currently defined as negative 1.
+        self.getUltrasonics()
 
         # Urgency is calculated by a numpy inverse tangent function. This acheives a gradual increase in urgency
         # or a nonlinear increase in urgency.
@@ -309,9 +310,9 @@ class Robot:
         # m is defined as the max urgency distance, and is where urgency will be defined as one.
         # NOTE: theoretically, urgencies greater than 1 are possible, and can definitely be handled, but
         # getting an urgency greater than 1 is definitely just bad.
-        fUrgency = (2 / np.pi) * np.arctan(k * (self.frontDist - m)) + 1
-        rUrgency = (2 / np.pi) * np.arctan(k * (self.rightDist - m)) + 1
-        lUrgency = (2 / np.pi) * np.arctan(k * (self.leftDist - m)) + 1
+        fUrgency = (2 / np.pi) * np.arctan(self.k * (self.frontDist - self.m)) + 1
+        rUrgency = (2 / np.pi) * np.arctan(self.k * (self.rightDist - self.m)) + 1
+        lUrgency = (2 / np.pi) * np.arctan(self.k * (self.leftDist - self.m)) + 1
 
         self.urgencies[0] = fUrgency
         self.urgencies[1] = rUrgency
@@ -323,7 +324,7 @@ class Robot:
     # clyCount - Takes the number of cylinders taken as cargo
     # cubeCount - takes the number of cubes taken as cargo
     # coneCount - takes the number of cones taken as cargo
-    def dismount(self, cylCount, cubeCount, coneCount):
+    def dismount(self):
         # The amount of time it takes the fully dismount
 
         for i in range(0, self.trailerPower):
