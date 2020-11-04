@@ -3,6 +3,7 @@
 
 import brickpi3
 import time
+import sensors as s
 
 # Accelerates the machine to a specific power value, from the current value over the course of time t.
 # bp takes the brickpi object originally created.
@@ -81,5 +82,18 @@ def rotateAxle(bp, steer, target, initialPos, degreesps = 200, t = 0):
     bp.set_motor_position(steer, target)
 
     return target
-    
+
+# Determines how much to turn based on the urgencies function from sensors.py
+# bp  - takes the brickpi object
+# steer - takes the steering motors
+# pos - takes the current position of the steering.
+# urgencies - takes a tuple of urgencies, (front, right, left), saying how urgent it is to turn
+# AWAY from that direction. 
+def turnFromUrgency(bp, steer, pos, urgencies):
+    f = urgencies[0] # The front urgency
+    r = urgencies[1] # the right urgency
+    l = urgencies[2] # the left urgency
+
+    # TODO determine the direction to turn based on the urgencies value. Fucking do this with
+    # Annelise in the room please.
 

@@ -21,9 +21,12 @@ def main():
         steer = bp.PORT_D
 
         # Initalize sensor ports
-        front = 4
+        frontU = 3
+        rightU = 4
+        leftU = 8
 
-        wallStop(bp, right, left, steer, front)
+        drive.setStraight(bp, steer, 1)
+        avoid(bp, right, left, steer, front)
 
         time.sleep(3)
         
@@ -33,14 +36,8 @@ def main():
         
     except KeyboardInterrupt:
         bp.reset_all()
-    except NameError as error:
-        print(error)
-        bp.reset_all()
-    except IOError as error:
-        print(error)
-        bp.reset_all()
-    except TypeError as error:
-        print(error)
+    except Exception as e:
+        print(e)
         bp.reset_all()
 
 def wiggle(bp, right, left, steer):
@@ -117,6 +114,45 @@ def wallSlow(bp, right, left, steer, frontSonic):
             power = drive.stop(bp, right, left, power, .1)
 
     power = drive.stop(bp, right, left, power, .1)
+
+# DEPRECATED AS OF ADDING ADDITIONAL ULTRASONICS
+def avoidDeprecated(bp, right, left, steer, frontSonic):
+    pos = bp.get_motor_encoder(steer)
+    pos = drive.setStraight(bp, steer, pos)
+
+    power = 0
+    maxPower = 40
+    slowDist = 60
+    stopDist = 15
+    degreeChange = 50
+    power = drive.accelerate(bp, right, left, power, maxPower, 1)
+    dist = s.getUltrasonic(frontSonic)
+
+    while dist > 15:
+        newDir = s.getSurroundings(bp, frontSonic, steer, pos, degreeChange)
+        pos = drive.rotateAxle(bp, steer, degreeChange * newDir, pos, degreesps = 360)
+        
+        print(dist)
+        time.sleep(.01)
+        dist = s.getUltrasonic(frontSonic)
+
+        if dist <= slowDist:
+            newPower = maxPower - int(.5 * (slowDist - dist))
+            power = drive.accelerate(bp, right, left, power, newPower, .1)
+
+def avoid(bp, rightm, leftm, steer, front, rightu, leftu):
+    pos = pos = bp.get_motor_encoder(steer)
+    pos = drive.setStraight(bp, steer, pos)
+
+    power = 0
+    maxPower = 40
+    slowDist = 60
+    stopDist = 15
+    degreeChange = 50
+    power = drive.accelerate(bp, right, left, power, maxPower, 1)
+    
+            
+        
     
 if __name__ == "__main__":
     main()
