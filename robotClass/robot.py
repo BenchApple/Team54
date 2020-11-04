@@ -31,6 +31,9 @@ class Robot:
     cylCount = False # Stores the number of cylinders carried
     cubeCount = False # Stores the number of cubes carried
     coneCount = False # Stores the number of cones carried.
+    m = 20 # Max urgency distance, used in turning calculations
+    k = -1 # Urgency constant, used in turning calculations
+    maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
 
     # Initialization function, takes all motor and ultrasonic sensor arguments from above.
     def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, _cyl, _cube, _cone):
@@ -175,6 +178,30 @@ class Robot:
     # Sets a new value for the number of coneinders
     def setConeCount(self, cone):
         self.coneCount = cone
+
+    # Returns the urgency distance
+    def getM(self):
+        return self.m
+
+    # Lets the user set a new value for m
+    def setM(self, _m):
+        self.m = _m
+
+    # Returns the current k value
+    def getK(self):
+        return self.k
+
+    # Allows the user to replace the current k value
+    def setK(self, _k):
+        self.k = _k
+
+    # Returns the current max turn value
+    def getMaxTurn(self):
+        return self.maxTurn
+
+    # Allows the user to set a new value for the maxTurn
+    def setMaxTurn(self, mt):
+        self.maxTurn = mt
 
     # Accelerates the machine to a specific power value, from the current value over the course of time t
     # targetPower takes the desired power for the motors, the top speed.
