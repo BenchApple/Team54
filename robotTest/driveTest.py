@@ -7,6 +7,7 @@ import sensors as s
 import brickpi3
 import grovepi
 import time
+import traceback
 
 # Initlailize our brickpi object
 bp = brickpi3.BrickPi3()
@@ -26,7 +27,7 @@ def main():
         leftU = 8
 
         drive.setStraight(bp, steer, 1)
-        avoid(bp, right, left, steer, front)
+        #avoid(bp, right, left, steer, front)
 
         time.sleep(3)
         
@@ -36,8 +37,8 @@ def main():
         
     except KeyboardInterrupt:
         bp.reset_all()
-    except Exception as e:
-        print(e)
+    except Exception:
+        traceback.print_exc()
         bp.reset_all()
 
 def wiggle(bp, right, left, steer):
@@ -155,7 +156,7 @@ def avoid(bp, rightm, leftm, steer, front, rightu, leftu):
     rDist = s.getUltrasonic(rightu)
     lDist = s.getUltrasonic(leftu)
 
-    while fdist
+    #while fdist
             
         
     

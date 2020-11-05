@@ -11,21 +11,26 @@ import time
 import numpy as np
 
 class Robot:
-    # Class variables - Anything initialized to false will be assigned by the user during object initialization
-    power = 0 # Stores the persistent power of the two back motors NOTE: may change to degrees per second
-    pos = 0 # Stores the position of the steering motor. abs(pos) always less than 250
-    urgencies = [0, 0, 0] # Stores the urgency array in order [front, right, left]
-    frontDist = 500 # Stores the distance read by the front ultrasonic
-    rightDist = 500 # Stores the distance read by the right ultrasonic
-    leftDist = 500 # Stores the distance read by the left ultrasonic
-    dismountTime = 5 # Stores the time desired to let the dismount happen.
-    trailerPower = -15 # Stores the power for the trailer motor.
-    m = 20 # Max urgency distance, used in turning calculations
-    k = -1 # Urgency constant, used in turning calculations
-    maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
-
     # Initialization function, takes all motor and ultrasonic sensor arguments from above.
-    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, _cyl=0, _cube=0, _cone=0):
+    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, rl_, ll_, hall_, _cyl=0, _cube=0, _cone=0):
+        # Class variables - Anything initialized to false will be assigned by the user during object initialization
+        self.power = 0 # Stores the persistent power of the two back motors NOTE: may change to degrees per second
+        self.pos = 0 # Stores the position of the steering motor. abs(pos) always less than 250
+        self.urgencies = [0, 0, 0] # Stores the urgency array in order [front, right, left]
+        self.frontDist = 500 # Stores the distance read by the front ultrasonic
+        self.rightDist = 500 # Stores the distance read by the right ultrasonic
+        self.leftDist = 500 # Stores the distance read by the left ultrasonic
+        self.dismountTime = 5 # Stores the time desired to let the dismount happen.
+        self.trailerPower = 40 # Stores the power for the trailer motor.
+        self.m = 20 # Max urgency distance, used in turning calculations
+        self.k = -1 # Urgency constant, used in turning calculations
+        self.maxTurn = 250 # Stores the abs val of the max distance from 0 that the robot can turn.
+        self.lineTurn = 30 # Stores the base turn if the line finder finds a black line.
+        self.rlReading = False # Stores the state of the right line finder. False if white line, true if black line
+        self.llReading = False # Stores the state of the left line finder. False if while line, true if black line
+        self.hallReading = False # Stores the state of the hall sensor. False if no reading, true if there is reading
+
+        # All of these are variables determined by the user.
         self.bp = _bp # Stores the brickpi object
         self.leftM = _lm # Stores the left drive motor
         self.rightM = _rm # stores the right drive motor
@@ -34,10 +39,18 @@ class Robot:
         self.rightU = _ru # stores the port of the right ultrasonic
         self.leftU = _lu # Stores the port of the left ultrasonic 
         self.frontU = _fu # stores the port of the front ultrasonic
+        self.rightLine = rl_ # Stores the ID for the right line finder.
+        self.leftLine = ll_ # Stores the ID for the left line finder.
+        self.hall = hall_ # Stores the ID for the hall sensor.
         self.cylCount = _cyl # Stores the number of cylinders
         self.cubeCount = _cube # stores the number of cubes
         self.coneCount = _cone # stores the number of comes.
-        self.diagnostics()
+        self.diagnostics() # Runs the diagnostics function.
+
+        # Set the pin modes for the grovepi.
+        grovepi.pinMode(self.rightLine, "INPUT")
+        grovepi.pinMode(self.leftLine, "INPUT")
+        grovepi.pinMode(self.hall, "INPUT")
 
     # TODO create a setup function for basic instrument calibration.
 
@@ -116,6 +129,39 @@ class Robot:
     # Sets a new value for the front sonic ID
     def setFrontU(self, fu):
         self.frontU = fu
+
+    # Returns the ID for the right line finder
+    def getRightLineID(self):
+        return self.rightLine
+
+    def setRightLineID(self, rl):
+        self.rightLine = rl
+
+    def getLeftLineID(self):
+        return self.leftLine
+
+    def setLeftLineID(self, ll):
+        self.leftLine = ll
+
+    # Gets the ID for the hall sensor
+    def getHallID(self):
+        return self.hall
+
+    # Sets the hall id to a new value
+    def setHallID(self, h):
+        self.hall = h
+
+    # returns the current reading of the hall sensor.
+    def getHallStatus(self):
+        return self.hallReading
+
+    # Returns the current status of the right line reading
+    def getRightLineReading(self):
+        return self.rlReading
+    
+    # Returns the current status of the left line reading
+    def getLeftLineReading(self):
+        return self.llReading
 
     # returns the current front distance
     def getFrontDist(self):
@@ -335,3 +381,31 @@ class Robot:
         for i in range(self.trailerPower, 0, -1 if self.trailerPower > 0 else 1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(0.01)
+
+    # Gets the readings from the two line finders. True if black line detected, False if no line detected
+    def getLineReadings(self):
+        if grovepi.digitalRead(self.rightLine) == 1:
+            self.rlReading = True
+        else:
+            self.rlReading = False
+
+        if grovepi.digitalRead(self.leftLine) == 1:
+            self.llReading = True
+        else:
+            self.llReading = False
+
+    # Basic reaction to the data from the line finders. Just turns towards the side with the line reading.
+    def reactToLineFinders(self):
+        d = 0
+        if self.rlReading:
+            d = 1
+        elif self.llReading:
+            d = -1
+
+        self.rotateAxle(self.pos + (self.lineTurn * d))
+
+    # Gets the readings from the hall sensor and sets the reading variable to true if detected, false if not
+    def getHallReading(self):
+        self.hallReading = True if grovepi.digitalRead(self.hall) == 1 else False
+
+
