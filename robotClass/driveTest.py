@@ -6,6 +6,7 @@ from robot import Robot
 import brickpi3
 import grovepi
 import time
+import traceback
 
 def main():
     try:
@@ -24,14 +25,16 @@ def main():
         frontU = 3
         rightU = 4
         leftU = 8
+        rightLine = 5
+        leftLine = 6
+        hall = 7
 
         time.sleep(1)
 
         # initialize our robot value
-        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU)
+        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightLine, leftLine, hall)
         r.diagnostics()
-        #avoid(r)
-        
+        testUltrasonics(r)
 
         time.sleep(2)
         
@@ -41,9 +44,15 @@ def main():
         
     except KeyboardInterrupt:
         bp.reset_all()
-    #except Exception as e:
-     #   print(e)
-      #  bp.reset_all()
+    except Exception as e:
+        traceback.print_exc()
+        bp.reset_all()
+
+def testUltrasonics(r):
+    while True:
+        r.getUltrasonics()
+
+        print(r.getLeftDist(), r.getFrontDist(), r.getRightDist())
 
 def wiggle(r):
     r.accelerate(60, 1)
