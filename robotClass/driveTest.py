@@ -29,9 +29,8 @@ def main():
 
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU)
-        print(r.getTrailerM())
-        r.dismount()
-        r.accelerate(40, 1)
+        r.diagnostics()
+        #avoid(r)
         
 
         time.sleep(2)
@@ -103,7 +102,7 @@ def avoidDeprecated(bp, right, left, steer, frontSonic):
 
 # TODO finish writing this function with the three ultrasonics. avoidDeprecated will work when adjusted to new system.
 def avoid(r):
-    maxPower = 45
+    maxPower = 30
     slowDist = 60
     stopDist = 20
     degreeChange = 50
@@ -114,7 +113,7 @@ def avoid(r):
         r.getUrgency()
         r.turnFromUrgency()
 
-    r.stop()
+    r.stop(.1)
             
         
     

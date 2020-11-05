@@ -253,7 +253,7 @@ class Robot:
     # TODO: Determine exactly how far in degrees the robot can rotate before it hits its max. Implement stoppers to prevent calls past that point.
     # With the current (7 hole) design, the limit in degrees is 200
     # With the 9 hole design, the limit in degrees is 250
-    def rotateAxle(self, target, degreesps = 200, t = 0):
+    def rotateAxle(self, target, degreesps = 360, t = 0):
         if abs(target) > 250: # TODO: set some sort of proper way to handle this situation.
             target = self.maxTurn if target > 1 else -self.maxTurn
     
