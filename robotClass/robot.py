@@ -397,15 +397,20 @@ class Robot:
     # Basic reaction to the data from the line finders. Just turns towards the side with the line reading.
     def reactToLineFinders(self):
         d = 0
-        if self.rlReading:
+        if self.rlReading and not self.llReading:
             d = 1
+            print("turning right")
         elif self.llReading:
             d = -1
+            print("turning left")
 
         self.rotateAxle(self.pos + (self.lineTurn * d))
 
     # Gets the readings from the hall sensor and sets the reading variable to true if detected, false if not
     def getHallReading(self):
-        self.hallReading = True if grovepi.digitalRead(self.hall) == 1 else False
+        if grovepi.digitalRead(self.hall):
+            self.hallReading = True
+        else:
+            self.hallReading = False
 
 

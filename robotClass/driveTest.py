@@ -25,8 +25,8 @@ def main():
         frontU = 3
         rightU = 4
         leftU = 8
-        rightLine = 5
-        leftLine = 6
+        rightLine = 2
+        leftLine = 5
         hall = 7
 
         time.sleep(1)
@@ -34,7 +34,8 @@ def main():
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightLine, leftLine, hall)
         r.diagnostics()
-        testUltrasonics(r)
+        testLines(r)
+        
 
         time.sleep(2)
         
@@ -47,6 +48,21 @@ def main():
     except Exception as e:
         traceback.print_exc()
         bp.reset_all()
+
+def testLines(r):
+    while True:
+        r.getLineReadings()
+        print (r.getRightLineReading())
+        print (r.getLeftLineReading())
+        print(" ")
+        r.reactToLineFinders()
+        time.sleep(.25)
+
+def testHall(r):
+    while True:
+        r.getHallReading()
+        print (r.getHallStatus())
+        time.sleep(.1)
 
 def testUltrasonics(r):
     while True:
