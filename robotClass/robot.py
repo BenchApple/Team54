@@ -15,6 +15,7 @@ class Robot:
     def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, rl_, ll_, hall_, _cyl=0, _cube=0, _cone=0):
         # Class variables - Anything initialized to false will be assigned by the user during object initialization
         self.power = 0 # Stores the persistent power of the two back motors NOTE: may change to degrees per second
+        self.dps = 0 # Stores the degrees per second of rotation in the two drive motors
         self.pos = 0 # Stores the position of the steering motor. abs(pos) always less than 250
         self.urgencies = [0, 0, 0] # Stores the urgency array in order [front, right, left]
         self.frontDist = 500 # Stores the distance read by the front ultrasonic
@@ -61,6 +62,10 @@ class Robot:
     # Sets a new value to bp, takes the new bp as an argument
     def setBP(self, newBP):
         self.bp = newBP
+
+    # Returns the current degrees per second.
+    def getDPS(self):
+        return self.dps
 
     # Returns the value of leftM
     def getLeftM(self):
@@ -250,7 +255,7 @@ class Robot:
     # Note: Originally implemented by changing the power of both of the motors at the same time,
     # but might be better to instead set the power of one of them then somehow make it so the other one
     # constantly matches the first one.
-    def accelerate(self, targetPower, t):
+    def accelerateOld(self, targetPower, t):
         # Calculates the time step of the acceleration,
         timeStep = abs(t / (targetPower - self.power)) if targetPower != self.power else 0
         # how much time in between power increase.
@@ -274,12 +279,62 @@ class Robot:
         # to the return of this funciton.
         self.power = targetPower
 
+    # Accelerates both motors to the target dps over time t
+    # target dps takes the new desired dps
+    # t takes the amount of time to reach that new dps
+    # TODO test to see what dps values are desired.
+    def accelerate(self, targetDPS, t):
+        dpsStep = 5 # How much the DPS will change per cycle
+
+        # calculate the time step for the acceleration
+        timeStep = abs(t / (targetDPS - (self.dps * dpsStep))) if targetDPS != self.power else 0
+
+        # Determine the direction of the acceleration
+        direc = -1 if targetDPS > self.dps else 1
+
+        # Change the dps of the motors dpsStep per time step
+        # NOTE since the motors are oriented backwards, in order to move forwards, we accelerate in the negative direction.
+        # The input, however, takes positive integers to maintain simplicity.
+        for i in range(-self.dps, -targetDPS, direc * dpsStep):
+            # Set both of the motors to the new power
+            self.bp.set_motor_dps(self.rightM, i)
+            self.bp.set_motor_dps(self.leftM, i)
+
+            # Wait for the time step before the next increment. If the time step is really small, ignore
+            if timeStep > .005:
+                time.sleep(timeStep)
+
+        # Return the final dps of the motors
+        self.dps = targetDPS
+
+    # Simply changes the drive motor DPS to a new value. ONLY to be used with small dps changes.
+    def setDPS(self, target):
+        self.bp.set_motor_dps(self.rightM, target)
+        self.bp.set_motor_dps(self.leftM, target)
+
+        self.dps = target
+
+    # THIS IS THE ONLY METHOD THAT SHOULD BE CALLED BY THE USER TO SET NEW MOVEMENT
+    # Takes the new dps and calculates whether or not to simply change the dps or to accelerate to that new dps.
+    # Also calculates the time over which the acceleration should take.
+    # TODO test to see the how fast the motors can actually accelerate without breaking the gear assembly
+    def driveMotors(self, targetDPS):
+        accelThreshold = 90 # If the change in motor dps is greater than this value, accelerate the robot to it TODO test this value
+        
+        if abs(targetDPS - self.dps) > accelThreshold:
+            # Call accelerate after calculating the time step.
+            timeStep = abs(targetDPS - self.dps) * .02
+            self.accelerate(targetDPS, timeStep)
+        else:
+            self.setDPS(targetDPS)
+
+    # DEPRECATED
     # Stops the vehible over the course of time t.
     # bp takes the brickpi object
     # right and left take the brickpi designations for the right and left motors respectively.
     # intial power takes the power of the motors at the time of calling the function.
     # t takes the amount of time the stopping should take place over
-    def stop(self, t):
+    def stopOld(self, t):
         self.accelerate(0, t) # No need for assignment since acceleration does it anyways
 
 
