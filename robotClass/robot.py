@@ -14,7 +14,7 @@ from math import sqrt
 
 class Robot:
     # Initialization function, takes all motor and ultrasonic sensor arguments from above.
-    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, rl_, ll_, hall_, _cyl=0, _cube=0, _cone=0):
+    def __init__(self, _bp, _lm, _rm, _sm, _tm, _ru, _lu, _fu, rl_, ll_, hall_, dropSite_, minDPS_, _cyl=0, _cube=0, _cone=0):
         # Class variables - Anything initialized to false will be assigned by the user during object initialization
         self.power = 0 # Stores the persistent power of the two back motors NOTE: may change to degrees per second
         self.dps = 0 # Stores the degrees per second of rotation in the two drive motors
@@ -34,6 +34,8 @@ class Robot:
         self.hallReading = False # Stores the state of the hall sensor. False if no reading, true if there is reading
         self.startDPS = 30 # The dps when we start the robot, also happens right after turning TODO write get set for this
         self.mpu = MPU9250() # The IMU object, initialized by a bunch of code I don't know
+        self.magBeaconsDetected = 0 # Tracks the number of magnetic beacons the robot has passed over.
+        self.wallStopDist = 15 # The distance at which the robot stops from the ultrasonic sensor.
 
         # All of these are variables determined by the user.
         self.bp = _bp # Stores the brickpi object
@@ -50,8 +52,10 @@ class Robot:
         self.cylCount = _cyl # Stores the number of cylinders
         self.cubeCount = _cube # stores the number of cubes
         self.coneCount = _cone # stores the number of comes.
+        self.dropSite = dropSite_ # Stores the drop site the robot will go to. Either A, B, or C
+        self.minDPS = minDPS_ # Stores the absolute minimum degrees per second of the robot, build other stuff off of this.
         self.diagnostics() # Runs the diagnostics function.
-        self.bp.set_motor_limits(self.steerM, dps = 500)
+        self.bp.set_motor_limits(self.steerM, dps = 500) # Set the limits for the steering motor.
 
         # Set the pin modes for the grovepi.
         grovepi.pinMode(self.leftLine, "INPUT")
@@ -62,7 +66,27 @@ class Robot:
         self.mag = self.mpu.readMagnet()
         self.magMagn = sqrt(self.mag['x'] ** 2 + self.mag['y'] ** 2 + self.mag['z'] ** 2)
 
+        self.dropAfter = -1 # dropAfter keeps track of the number of magnetic beacons we need to pass before dropping the payload.
+        # Set up the magnetic beacon limit.
+        if self.dropSite = 'A':
+            self.dropAfter = 1
+        elif self.dropSite = 'B':
+            self.dropAfter = 2
+        elif self.dropSite = 'C':
+            self.dropAfter = 3
+
+        # TODO set degrees per second based on the cargo load we're carrying.
+        self.degreesps = self.minDPS
+
+
     # TODO create a setup function for basic instrument calibration.
+
+    # Returns the number of magnitic beacons detected so far
+    def getBeaconsDetected(self):
+        return self.magBeaconsDetected
+
+    def resetMagBeacons(self):
+        self.magBeaconsDetected = 0
 
     # Returns the value of the class variable bp
     def getBP(self):
@@ -526,5 +550,21 @@ class Robot:
     # Gets the readings from the hall sensor and sets the reading variable to true if detected, false if not
     def getHallReading(self):
         self.hallReading = False if grovepi.digitalRead(self.hall) == 1 else True
+
+    # This function allows the robot to turn based on only one line finder when it needs to go off the path for drop off
+    # Still don't know the methodology for it, just putting it here because i need the reminder.
+    def turnFromBeacon(self):
+        pass
+
+    # Stops the robot if the ultrasonic sensor sees something too close (within wall stop distance)
+    def wallStop(self):
+        self.getUltrasonics()
+
+        while (self.frontDist < self.wallStopDist):
+            self.getUltrasonics()
+
+            self.stop()
+        
+        self.driveMotors(self.degreesps)
 
 

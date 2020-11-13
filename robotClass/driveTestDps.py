@@ -29,10 +29,13 @@ def main():
         leftL = 8
         hall = 7
 
+        dropSite = 'A'
+        minDPS = 30
+
         time.sleep(1)
 
         # initialize our robot value
-        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall)
+        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall, dropSite, minDPS)
         r.diagnostics()
         #r.rotateAxle(-r.getMaxTurn())
         #turnTest(r)
