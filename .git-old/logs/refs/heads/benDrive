@@ -1,0 +1,6 @@
+0000000000000000000000000000000000000000 fa5a6cbb374c7ab77c7aaf4bdc71e8e13b91c5bd team_54 <team_54@engr.(none)> 1604442270 +0000	branch: Created from HEAD
+fa5a6cbb374c7ab77c7aaf4bdc71e8e13b91c5bd 4b9ee80e56fb2d68fe36b8715731062b4f7d4b1d team_54 <team_54@engr.(none)> 1604442283 +0000	pull origin benDrive: Fast-forward
+4b9ee80e56fb2d68fe36b8715731062b4f7d4b1d 64d8e2f0ac5ca8046dcdd5cfcf2427f265968a15 Ben Chappell <bjchappell02@icloud.com> 1604443435 +0000	commit: Wall slow not working but sensors working well on pi 2
+64d8e2f0ac5ca8046dcdd5cfcf2427f265968a15 98df5d8143a0aca699033960eaffdf9eddaa2d78 Ben Chappell <bjchappell02@icloud.com> 1604448811 +0000	commit: created urgencies, started turn from urgencies. Need to write code for trailer dismount
+98df5d8143a0aca699033960eaffdf9eddaa2d78 a40b81a50aa08726f366cc0ee7e0e0eb2d9abbe6 Ben Chappell <bjchappell02@icloud.com> 1604503297 +0000	commit: please work please
+a40b81a50aa08726f366cc0ee7e0e0eb2d9abbe6 03afab4acd4a214e2a6905d9b53eb1ae403bac4e Ben Chappell <bjchappell02@icloud.com> 1604504007 +0000	commit: Added trailer.py and its function dismount
