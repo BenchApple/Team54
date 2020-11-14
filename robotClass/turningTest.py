@@ -27,7 +27,7 @@ def main():
         frontU = 8
         rightU = 4
         leftU = 7
-        rightL = 3
+        rightL = 4
         leftL = 8
         hall = 7
 
@@ -39,6 +39,7 @@ def main():
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall, dropSite, minDPS)
         r.diagnostics()
+        r.setStraight()
 
         rubberBandTests(r)
         #basicTurnTests(r)
@@ -63,11 +64,12 @@ def rubberBandTests(r):
 
     while True:
         r.driveMotors(r.getMinDps())
-        activated = t.rubberBandTurning(r, activated)
 
-        #results = t.rubberBandAccelTurning(r, activated, d)
-        #activated = results[0]
-        #d = results[1]
+        #activated = t.rubberBandTurning(r, activated)
+
+        results = t.rubberBandAccelTurning(r, activated, d)
+        activated = results[0]
+        d = results[1]
 
 
 def basicTurnTests(r):
@@ -83,3 +85,6 @@ def basicTurnTests(r):
         #t.fastIncreaseTurnSpeed(r)
 
     r.stop()
+
+if __name__ == "__main__":
+    main()
