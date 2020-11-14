@@ -144,7 +144,8 @@ def rubberBandTurning(robot, activatedLineFinder):
     print("Turning from line finders " + str(robot.getLineTurn() * activatedLineFinder) + " degrees")
     turning = robot.rotateAxle(robot.getPos() + (robot.getLineTurn() * activatedLineFinder))
 
-        
+    # Return the activated Line finder so it can be passed back into the function the next time it's called.
+    return activatedLineFinder
 
 
 
