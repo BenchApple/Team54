@@ -29,7 +29,7 @@ class Robot:
         self.k = -1 # Urgency constant, used in turning calculations
         self.maxTurn = 270 # Stores the abs val of the max distance from 0 that the robot can turn.
         self.lineTurn = 10 # Stores the base turn if the line finder finds a black line.
-        self.baseLineTurn = 10 # Stores the base value of the line turn, since we do other stuff with lineTurn sometimes
+        self.baseLineTurn = self.lineTurn # Stores the base value of the line turn, since we do other stuff with lineTurn sometimes
         self.rlReading = False # Stores the state of the right line finder. False if white line, true if black line
         self.llReading = False # Stores the state of the left line finder. False if while line, true if black line
         self.hallReading = False # Stores the state of the hall sensor. False if no reading, true if there is reading

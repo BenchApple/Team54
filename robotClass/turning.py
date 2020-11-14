@@ -113,7 +113,6 @@ def fastIncreaseTurnSpeed(robot):
 #                       activated last, allowing us to keep track of which direction to turn back to 0 from
 #                       1 means right, -1 means left, 0 means neither (straight) gets reset upon the position being 0.
 def rubberBandTurning(robot, activatedLineFinder):
-    robot.driveMotors(robot.getMinDps())
     robot.getLineReadings()
     turning = True # keeps track of whether or not we have reached the edge of how much we can turn.
     d = 0 # Stores the direction in which we're turning 1 means right, -1 left, 0 no turn
@@ -127,6 +126,7 @@ def rubberBandTurning(robot, activatedLineFinder):
             d = 1
         elif robot.getLeftLineReading():
             activatedLineFinder = -1
+            d = -1
     elif activatedLineFinder == 1: # If the right line finder was the most recently activated one, go here
         if robot.getRightLineReading():
             activatedLineFinder = 1
@@ -147,8 +147,46 @@ def rubberBandTurning(robot, activatedLineFinder):
     # Return the activated Line finder so it can be passed back into the function the next time it's called.
     return activatedLineFinder
 
+# Implements the rubberBandTurning function but with the turning speed increasing every time d is the same as the previous call to the function.
+def rubberBandAccelTurning(robot, activatedLineFinder, prevD):
+    robot.getLineReadings()
+    turning = True # keeps track of whether or not we have reached the edge of how much we can turn.
+    d = 0 # Stores the direction in which we're turning 1 means right, -1 left, 0 no turn
 
+    if abs(robot.getPos()) < robot.getLineTurn(): # close enough to straight, just in case there's some sort of error.
+        activatedLineFinder = 0
 
+    if (not activatedLineFinder):
+        if robot.getRightLineReading():
+            activatedLineFinder = 1
+            d = 1
+        elif robot.getLeftLineReading():
+            activatedLineFinder = -1
+            d = -1
+    elif activatedLineFinder == 1: # If the right line finder was the most recently activated one, go here
+        if robot.getRightLineReading():
+            activatedLineFinder = 1
+            d = 1
+        else: # if the right line finder isn't activated, start turning back towards center.
+            d = -1
+    elif activatedLineFinder == -1: # If the left line finder was the one last activated, go here
+        if robot.getLeftLineReading():
+            activatedLineFinder = -1
+            d = -1
+        else: # if the left line finder isn't activated, turn back towards center.
+            d = 1
+
+    if d == prevD:
+        robot.setLineTurn(robot.getLineTurn() + 1)
+    else:
+        robot.setLineTurn(robot.getBaseLineTurn())
+
+    # Turn based on what the line finders found. Should be easy to adapt to changine lineTurn values similar to other increaseTurnSpeed functions.
+    print("Turning from line finders " + str(robot.getLineTurn() * activatedLineFinder) + " degrees")
+    turning = robot.rotateAxle(robot.getPos() + (robot.getLineTurn() * activatedLineFinder))
+
+    # Return the activated Line finder so it can be passed back into the function the next time it's called.
+    return [activatedLineFinder, d]
 
 
 # The idea here is that the robot turns a specific amount before pulsing forward, until the max turn is reached.
