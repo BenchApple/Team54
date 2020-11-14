@@ -68,15 +68,15 @@ class Robot:
 
         self.dropAfter = -1 # dropAfter keeps track of the number of magnetic beacons we need to pass before dropping the payload.
         # Set up the magnetic beacon limit.
-        if self.dropSite = 'A':
+        if self.dropSite == 'A':
             self.dropAfter = 1
-        elif self.dropSite = 'B':
+        elif self.dropSite == 'B':
             self.dropAfter = 2
-        elif self.dropSite = 'C':
+        elif self.dropSite == 'C':
             self.dropAfter = 3
 
         # TODO set degrees per second based on the cargo load we're carrying.
-        self.degreesps = self.minDPS
+        self.dps = self.minDPS
 
 
     # TODO create a setup function for basic instrument calibration.
@@ -567,4 +567,16 @@ class Robot:
         
         self.driveMotors(self.degreesps)
 
+    # Pulses the drive motors forward a given number of degrees.
+    def pulseForward(self, degrees):
+        rCurrentPos = self.bp.get_motor_encoder(self.rightM) # Gets the current positions of each of the motors
+        lCurrentPos = self.bp.get_motor_encoder(self.leftM)
 
+        # Iterates the positions of the motors forward.
+        for newPos in range(0, -degrees, -45): # To avoid going the wrong direction, set the position -45 degrees at a time.
+            self.bp.set_motor_position(self.rightM, rCurrentPos + newPos)
+            self.bp.set_motor_position(self.leftM, lCurrentPos + newPos)
+
+        # Set the positions to the final position
+        self.bp.set_motor_position(self.rightM, rCurrentPos - degrees)
+        self.bp.set_motor_position(self.leftM, lCurrentPos - degrees)

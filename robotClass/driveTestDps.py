@@ -81,6 +81,7 @@ def turnTest(r):
 
     time.sleep(1)
 
+@DeprecationWarning # Due to us now using turning.py for turning.
 def lineTurn(r):
     speed = 30
     r.driveMotors(speed)
