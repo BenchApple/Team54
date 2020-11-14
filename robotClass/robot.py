@@ -29,6 +29,7 @@ class Robot:
         self.k = -1 # Urgency constant, used in turning calculations
         self.maxTurn = 270 # Stores the abs val of the max distance from 0 that the robot can turn.
         self.lineTurn = 10 # Stores the base turn if the line finder finds a black line.
+        self.baseLineTurn = 10 # Stores the base value of the line turn, since we do other stuff with lineTurn sometimes
         self.rlReading = False # Stores the state of the right line finder. False if white line, true if black line
         self.llReading = False # Stores the state of the left line finder. False if while line, true if black line
         self.hallReading = False # Stores the state of the hall sensor. False if no reading, true if there is reading
@@ -80,6 +81,14 @@ class Robot:
 
 
     # TODO create a setup function for basic instrument calibration.
+
+    # Return the base line turn value.
+    def getBaseLineTurn(self):
+        return self.baseLineTurn
+
+    # Return minimum dps.
+    def getMinDps(self):
+        return self.minDPS
 
     # Returns the number of magnitic beacons detected so far
     def getBeaconsDetected(self):
@@ -309,6 +318,7 @@ class Robot:
     # Note: Originally implemented by changing the power of both of the motors at the same time,
     # but might be better to instead set the power of one of them then somehow make it so the other one
     # constantly matches the first one.
+    @DeprecationWarning
     def accelerateOld(self, targetPower, t):
         # Calculates the time step of the acceleration,
         timeStep = abs(t / (targetPower - self.power)) if targetPower != self.power else 0
@@ -528,6 +538,7 @@ class Robot:
         print (self.rlReading, self.llReading)
 
     # Basic reaction to the data from the line finders. Just turns towards the side with the line reading.
+    @DeprecationWarning # due to turning.py being implemented.
     def reactToLineFinders(self):
         #while (self.rlReading or self.llReading):
          #   self.getLineReadings()
@@ -565,7 +576,7 @@ class Robot:
 
             self.stop()
         
-        self.driveMotors(self.degreesps)
+        self.driveMotors(self.dps)
 
     # Pulses the drive motors forward a given number of degrees.
     def pulseForward(self, degrees):
