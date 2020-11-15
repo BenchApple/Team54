@@ -11,7 +11,7 @@ def main():
     try:
         i = 0 # Stores the number of iterations for the data collection.
         maxIter = 2500
-        fid = open("dontoverwritethedata.txt", 'w')
+        fid = open("passingrobotovermagnet.txt", 'w')
         testList = []
 
         # Initlailize our brickpi object
@@ -30,8 +30,11 @@ def main():
         rightL = 3
         leftL = 8
         hall = 7
+
+        dropSite = 'A'
+        mindps = 30
         
-        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall) # Initialize the robot with all 0 values since we're only reading the imu data
+        r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall, dropSite, mindps) # Initialize the robot with all 0 values since we're only reading the imu data
         
         while i < maxIter:
             r.getMagMagnReading()

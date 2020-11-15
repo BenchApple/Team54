@@ -24,11 +24,11 @@ class Robot:
         self.rightDist = 500 # Stores the distance read by the right ultrasonic
         self.leftDist = 500 # Stores the distance read by the left ultrasonic
         self.dismountTime = 6 # Stores the time desired to let the dismount happen.
-        self.trailerPower = 40 # Stores the power for the trailer motor.
+        self.trailerPower = 30 # Stores the power for the trailer motor.
         self.m = 20 # Max urgency distance, used in turning calculations
         self.k = -1 # Urgency constant, used in turning calculations
         self.maxTurn = 270 # Stores the abs val of the max distance from 0 that the robot can turn.
-        self.lineTurn = 10 # Stores the base turn if the line finder finds a black line.
+        self.lineTurn = 5 # Stores the base turn if the line finder finds a black line.
         self.baseLineTurn = self.lineTurn # Stores the base value of the line turn, since we do other stuff with lineTurn sometimes
         self.rlReading = False # Stores the state of the right line finder. False if white line, true if black line
         self.llReading = False # Stores the state of the left line finder. False if while line, true if black line
@@ -508,16 +508,16 @@ class Robot:
     # clyCount - Takes the number of cylinders taken as cargo
     # cubeCount - takes the number of cubes taken as cargo
     # coneCount - takes the number of cones taken as cargo
+    # For Cylinder - drive power = 25, trailer power = 40
     def dismount(self):
-        # The amount of time it takes the fully dismount
-        self.driveMotors(25)
+        self.driveMotors(40)
 
         for i in range(0, self.trailerPower, 1 if self.trailerPower > 0 else -1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(.05)
 
         time.sleep(self.dismountTime)
-        self.stop()
+        #self.stop()
 
         for i in range(self.trailerPower, 0, -1 if self.trailerPower > 0 else 1):
             self.bp.set_motor_power(self.trailerM, i)
@@ -535,7 +535,7 @@ class Robot:
         else:
             self.llReading = False
 
-        print (self.rlReading, self.llReading)
+        #print (self.rlReading, self.llReading)
 
     # Basic reaction to the data from the line finders. Just turns towards the side with the line reading.
     @DeprecationWarning # due to turning.py being implemented.
@@ -552,7 +552,7 @@ class Robot:
         elif self.llReading:
             d = -1
 
-        print("Turning from line finders " + str(self.lineTurn * d) + " degrees")
+        #print("Turning from line finders " + str(self.lineTurn * d) + " degrees")
 
         stillTurning = self.rotateAxle(self.pos + (self.lineTurn * d))
 

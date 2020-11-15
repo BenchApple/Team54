@@ -23,7 +23,7 @@ def main():
 
         # Initalize sensor ports
         frontU = 8
-        rightU = 4
+        rightU = 7
         leftU = 7
         rightL = 3
         leftL = 8
@@ -37,6 +37,8 @@ def main():
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall, dropSite, minDPS)
         r.diagnostics()
+        #wallStopTest(r)
+        stopAtMagnet(r)
         #r.rotateAxle(-r.getMaxTurn())
         #turnTest(r)
         #r.dismount()
@@ -60,6 +62,35 @@ def main():
 
 # Experimentally, without trailer dps = 30 to 35 power is the best speed for turning, we have yet to determine a top speed.
 # TODO test turning speed with trailer in order to determine optimal speed. Current one 40
+
+def stopAtMagnet(r):
+    magnetThreshold = 900
+    s = 40
+
+    r.driveMotors(s)
+
+    while r.getMagMagn() < magnetThreshold:
+        r.getMagMagnReading()
+
+    print ("magnet detected")
+    time.sleep(10)
+
+    print("started dismount")
+    r.dismount()
+
+    time.sleep(5)
+
+    r.stop()
+
+def wallStopTest(r):
+    s = 40
+    r.driveMotors(s)
+
+    while True:
+        r.wallStop()
+
+    r.stop()
+    
 
 def turnTest(r):
     #for i in range(0, -r.getMaxTurn() - 1, -10):
@@ -167,7 +198,7 @@ def test(r):
 def schmoovin(r):
     speed = 250
 
-    r.driveMotors(40)
+    r.driveMotors(70) # The robot requires 70 ish degrees per second in order to make it over the hill
 
     p = input("press button to stop robot")
 
