@@ -64,7 +64,7 @@ def ignoreRight(r):
 
     while True:
         r.driveMotors(r.getMinDps())
-        results = t.rubberBandAccelTurningFixedBack(r, activated, d)
+        results = t.rubberBandAccelTurningFixedBack(r, activated, d, 1)
         activated = results[0]
         d = results[1]
 
@@ -78,7 +78,7 @@ def rubberBandTests(r):
         #activated = t.rubberBandTurning(r, activated)
 
         #results = t.rubberBandAccelTurning(r, activated, d)
-        results = t.rubberBandAccelTurningFixedBack(r, activated, d)
+        results = t.rubberBandAccelTurningFixedBack(r, activated, d, 0)
         activated = results[0]
         d = results[1]
 

@@ -37,6 +37,7 @@ class Robot:
         self.mpu = MPU9250() # The IMU object, initialized by a bunch of code I don't know
         self.magBeaconsDetected = 0 # Tracks the number of magnetic beacons the robot has passed over.
         self.wallStopDist = 15 # The distance at which the robot stops from the ultrasonic sensor.
+        self.rampDps = 70 # the degrees per second needed to get over the ramp with no cargo
 
         # All of these are variables determined by the user.
         self.bp = _bp # Stores the brickpi object
@@ -77,10 +78,39 @@ class Robot:
             self.dropAfter = 3
 
         # TODO set degrees per second based on the cargo load we're carrying.
+        if self.cylCount > 0:
+            self.minDPS = 50
+            self.trailerPower = 40
+        elif self.coneCount > 0:
+            self.minDPS = 40
+            self.trailerPower = 20
+        elif self.cubeCount > 0:
+            self.trailerPower = 30
+            self.minDPS = 45
+        
         self.dps = self.minDPS
 
+        # TODO make sure that the cart changes its dps based on the cargo it has at any time.
 
     # TODO create a setup function for basic instrument calibration.
+
+    # Does basic recalibration, makes sure dps and stuff is set to the proper values
+    # should be added onto later.
+    def recalibrate(self):
+        if self.cylCount > 0:
+            self.minDPS = 50
+        elif self.coneCount > 0:
+            self.minDPS = 40
+        elif self.cubeCount > 0:
+            self.minDPS = 45
+
+    # return the number of magnetic beacons before we drop off the cargo.
+    def getDropAfter(self):
+        return self.dropAfter
+
+    # Returns the ramp dps
+    def getRampDps(self):
+        return self.rampDps
 
     # Return the base line turn value.
     def getBaseLineTurn(self):
@@ -89,6 +119,11 @@ class Robot:
     # Return minimum dps.
     def getMinDps(self):
         return self.minDPS
+
+    # Increments the number of beacons detected by 1
+    def incrementBeaconsDetected(self):
+        self.magBeaconsDetected += 1
+        return self.magBeaconsDetected
 
     # Returns the number of magnitic beacons detected so far
     def getBeaconsDetected(self):
@@ -402,6 +437,7 @@ class Robot:
     # right and left take the brickpi designations for the right and left motors respectively.
     # intial power takes the power of the motors at the time of calling the function.
     # t takes the amount of time the stopping should take place over
+    @DeprecationWarning 
     def stopOld(self, t):
         self.accelerate(0, t) # No need for assignment since acceleration does it anyways
 
@@ -441,7 +477,7 @@ class Robot:
             d = -1
 
         steeringStep = 45
-        for i in range(self.pos, target, d * 45):
+        for i in range(self.pos, target, d * steeringStep):
             self.bp.set_motor_position(self.steerM, i)
         
         self.bp.set_motor_position(self.steerM, target)
@@ -452,6 +488,7 @@ class Robot:
 
     # Determines how much to turn based on the urgencies function from sensors.py
     # TODO Finish this function
+    @ DeprecationWarning # Since we aren't using ultrasonics to steer anymore
     def turnFromUrgency(self):
         f = self.urgencies[0] # The front urgency
         r = self.urgencies[1] # the right urgency - positive direction
@@ -479,6 +516,7 @@ class Robot:
         #self.leftDist = grovepi.ultrasonicRead(self.leftU)
         self.frontDist = grovepi.ultrasonicRead(self.frontU)
 
+    @DeprecationWarning # Since we aren't using ultrasonics to steer anymore
     def getUrgency(self):
         # Get the updated ultrasonic readings
         self.getUltrasonics()
@@ -510,18 +548,22 @@ class Robot:
     # coneCount - takes the number of cones taken as cargo
     # For Cylinder - drive power = 25, trailer power = 40
     def dismount(self):
-        self.driveMotors(40)
+        self.driveMotors(self.minDPS)
 
         for i in range(0, self.trailerPower, 1 if self.trailerPower > 0 else -1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(.05)
 
-        time.sleep(self.dismountTime)
+        # TODO replace this time.sleep with something in the main loop to keep the thingie runnign.
+        #time.sleep(self.dismountTime)
         #self.stop()
 
+    # stops the dismount sequence.
+    def stopDismount(self):
         for i in range(self.trailerPower, 0, -1 if self.trailerPower > 0 else 1):
             self.bp.set_motor_power(self.trailerM, i)
             time.sleep(0.01)
+    
 
     # Gets the readings from the two line finders. True if black line detected, False if no line detected
     def getLineReadings(self):
@@ -559,13 +601,9 @@ class Robot:
         return stillTurning
 
     # Gets the readings from the hall sensor and sets the reading variable to true if detected, false if not
+    @DeprecationWarning # Since we aren't using a hall sensor
     def getHallReading(self):
         self.hallReading = False if grovepi.digitalRead(self.hall) == 1 else True
-
-    # This function allows the robot to turn based on only one line finder when it needs to go off the path for drop off
-    # Still don't know the methodology for it, just putting it here because i need the reminder.
-    def turnFromBeacon(self):
-        pass
 
     # Stops the robot if the ultrasonic sensor sees something too close (within wall stop distance)
     def wallStop(self):

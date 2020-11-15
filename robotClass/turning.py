@@ -192,18 +192,23 @@ def rubberBandAccelTurning(robot, activatedLineFinder, prevD):
     return [activatedLineFinder, d]
 
 # Implements the rubberBandTurning function but with the turning speed increasing every time d is the same as the previous call to the function.
-def rubberBandAccelTurningFixedBack(robot, activatedLineFinder, prevD):
+# This is going to be our final turning algorithm most likely.
+# ignore takes a line finder to ignore, as in not respond to. 0 means neither, 1 means right, -1 means left.
+def rubberBandAccelTurningFixedBack(robot, activatedLineFinder, prevD, ignore):
     robot.getLineReadings()
     turning = True # keeps track of whether or not we have reached the edge of how much we can turn.
     # d - Stores the direction in which we're turning 1 means right, -1 left, 0 no turn
 
     if (not activatedLineFinder):
-        if robot.getRightLineReading():
+        if robot.getRightLineReading() and ignore != 1:
             activatedLineFinder = 1
             d = 1
-        elif robot.getLeftLineReading():
+        elif robot.getLeftLineReading() and ignore != -1:
             activatedLineFinder = -1
             d = -1
+        else: # For some reason i wasn't running into errors without this, but i think else should help
+            activatedLineFinder = 0
+            d = 0
     elif activatedLineFinder == 1: # If the right line finder was the most recently activated one, go here
         if robot.getRightLineReading():
             activatedLineFinder = 1
