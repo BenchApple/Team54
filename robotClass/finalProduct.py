@@ -58,11 +58,18 @@ def main():
         activated = results[0]
         dismountEngageStartTime = time.time()
         timeBeforeDismount = 5 # The amount of time between detection of the magnet and dismount start.
+        straightCount = 0 # Counts the number of iterations in a row that the robot is straight
+        accelThreshold = 900 # Stores the number of times in a row that the robot must be straight to accel
+        # to ramp speed.
 
         # main event loop.
         while (r.getBeaconsDetected() < r.getDropAfter() + 2):
             # Drive the vehicle forwards.
-            r.driveMotors(r.getMinDps())
+            # If the vehicle has been driving straight for a certain number of iterations, increase to ramp dps
+            if straightCount > accelThreshold:
+                r.driveMotors(r.getRampDps())
+            else:
+                r.driveMotors(r.getMinDps())
 
             # Get all of the sensor readings we need.
             r.getMagMagnReading()
@@ -95,7 +102,14 @@ def main():
                     r.dismount()
                     dismountStartTime = time.time()
                 elif currentTime - dismountStartTime > r.getDismountTime():
-                    # TODO reset all cargo values after dismount.
+                    # Reset all cargo amounts
+                    r.setCylCount(0)
+                    r.setCubeCount(0)
+                    r.setConeCount(0)
+
+                    # Re-set min dps values to accomodate for not having any mroe cargo.
+                    r.recalibrate()
+
                     r.stopDismount()
                     engageDismount = False
 
@@ -107,10 +121,13 @@ def main():
             activated = results[0]
             d = results[1]
 
-            # TODO somehow get this to actually realize when it should accelerate to the wall dps 
             # Probably do some sort of counter to detect the number of times in a row that activated = 0
             # That way you could just detect when you're straight and run it.
-            # TODO still need to implement the ramp thing.
+            if d == 0:
+                straightCount += 1
+            else:
+                straightCount = 0
+
 
         r.stop()
 

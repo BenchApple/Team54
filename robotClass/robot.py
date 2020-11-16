@@ -103,6 +103,8 @@ class Robot:
             self.minDPS = 40
         elif self.cubeCount > 0:
             self.minDPS = 45
+        else:
+            self.minDPS = 35
 
     # return the number of magnetic beacons before we drop off the cargo.
     def getDropAfter(self):
