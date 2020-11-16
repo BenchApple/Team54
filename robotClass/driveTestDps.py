@@ -37,18 +37,9 @@ def main():
         # initialize our robot value
         r = Robot(bp, left, right, steer, trailer, rightU, leftU, frontU, rightL, leftL, hall, dropSite, minDPS)
         r.diagnostics()
-        #wallStopTest(r)
-        stopAtMagnet(r)
-        #r.rotateAxle(-r.getMaxTurn())
-        #turnTest(r)
-        #r.dismount()
-        #lineTurn(r)
-        #ultrasonicTest(r)
-        #rightLineCalib(r)
-        #leftLineCalib(r)
-        #schmoovin(r)
+        schmoovin(r)
 
-        time.sleep(2)
+        time.sleep(1)
         
         print("All done")
 
@@ -198,10 +189,11 @@ def test(r):
 def schmoovin(r):
     speed = 250
 
-    r.driveMotors(70) # The robot requires 70 ish degrees per second in order to make it over the hill
+    r.driveMotors(500) # The robot requires 70 ish degrees per second in order to make it over the hill
 
-    p = input("press button to stop robot")
-
+    #p = input("press button to stop robot")
+    print("max speed acheived")
+    
     r.stop()
 
 

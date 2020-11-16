@@ -70,7 +70,7 @@ def main():
             r.getLineReadings()
 
             # Check to see if a magnet is detected.
-            if r.getMagMagn() < magnetThreshold and not magnetDetected:
+            if r.getMagMagn() > magnetThreshold and not magnetDetected:
                 r.incrementBeaconsDetected() # Increment the detection count by one
 
                 # If the this is before the path we need to follow, ignore the branch
@@ -89,11 +89,13 @@ def main():
                 # Put all the dismount code here. I don't quite know what to do here yet.
                 # Use the fact that we know the time of the start of the dismount in order to do this.
                 currentTime = time.time()
+                ignore = 0
 
                 if currentTime - dismountEngageStartTime > timeBeforeDismount:
                     r.dismount()
                     dismountStartTime = time.time()
                 elif currentTime - dismountStartTime > r.getDismountTime():
+                    # TODO reset all cargo values after dismount.
                     r.stopDismount()
                     engageDismount = False
 

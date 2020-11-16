@@ -426,7 +426,7 @@ class Robot:
         
         if abs(targetDPS - self.dps) > accelThreshold:
             # Call accelerate after calculating the time step.
-            timeStep = abs(targetDPS - self.dps) * .05
+            timeStep = abs(targetDPS - self.dps) * .02
             self.accelerate(targetDPS, timeStep)
         else:
             self.setDPS(targetDPS)
