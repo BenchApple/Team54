@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # BEn Chappell
+=======
+# Ben Chappell
+>>>>>>> c339f6dbf52168b258eac2dd2e9fe329f457e943
 
 # File to test the effectiveness of the drive.py file
 
@@ -7,6 +11,10 @@ import sensors as s
 import brickpi3
 import grovepi
 import time
+<<<<<<< HEAD
+=======
+import traceback
+>>>>>>> c339f6dbf52168b258eac2dd2e9fe329f457e943
 
 # Initlailize our brickpi object
 bp = brickpi3.BrickPi3()
@@ -26,7 +34,11 @@ def main():
         leftU = 8
 
         drive.setStraight(bp, steer, 1)
+<<<<<<< HEAD
         avoid(bp, right, left, steer, front)
+=======
+        #avoid(bp, right, left, steer, front)
+>>>>>>> c339f6dbf52168b258eac2dd2e9fe329f457e943
 
         time.sleep(3)
         
@@ -36,8 +48,13 @@ def main():
         
     except KeyboardInterrupt:
         bp.reset_all()
+<<<<<<< HEAD
     except Exception as e:
         print(e)
+=======
+    except Exception:
+        traceback.print_exc()
+>>>>>>> c339f6dbf52168b258eac2dd2e9fe329f457e943
         bp.reset_all()
 
 def wiggle(bp, right, left, steer):
@@ -155,7 +172,11 @@ def avoid(bp, rightm, leftm, steer, front, rightu, leftu):
     rDist = s.getUltrasonic(rightu)
     lDist = s.getUltrasonic(leftu)
 
+<<<<<<< HEAD
     while fdist
+=======
+    #while fdist
+>>>>>>> c339f6dbf52168b258eac2dd2e9fe329f457e943
             
         
     
